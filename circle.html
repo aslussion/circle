@@ -15,86 +15,90 @@
 			}
 		</style>
 		<script>
-			window.onload = function() {
-				let canvas = document.getElementById("content");
-				canvas.width = canvas.offsetWidth;
-				canvas.height = canvas.offsetHeight;
-				let ctx = canvas.getContext("2d");//контекст рисования на холсте
-	  			
-	  			let area = {x:150,y:150,r:100};//область, за пределы которой не должен выходить круг
-	  			let ball = {x:150,y:150,r:10};//круг
-	  			PrintArea();
-	  			PrintBall();
+			class Circles{
+				area = {x:150,y:150,r:100};//область, за пределы которой не должен выходить круг
+				ball = {x:150,y:150,r:10};//круг
 
-	  			let areaCoordinates = AreaCoordinates();
-	  			let restrict = Restriction();
-	  			let mouseX, mouseY;
+				constructor(canvas) {
+					this.canvas = canvas;
+					this.canvas.width = this.canvas.offsetWidth;
+					this.canvas.height = this.canvas.offsetHeight;
+					this.ctx = this.canvas.getContext("2d");//контекст рисования на холсте
 
-				canvas.onmousemove = function(e) {
-					let canvasCoordinates = this.getBoundingClientRect();//объект координат элемента-canvas
-					//console.log(canvasCoordinates);
-					mouseX = e.clientX - canvasCoordinates.left;//координаты мыши 
-      				mouseY = e.clientY - canvasCoordinates.top;//относительно canvas'a
+				    this.PrintArea();
+	  				this.PrintBall();
 
-					ctx.clearRect(0, 0, canvas.width, canvas.height);//очистить прямоугольник размерами canvas'a
-					PrintArea();
+	  				this.restrict = this.Restriction();
 
-					MoveBall();
-				};
+	  				//document.getElementById('prevbtn').addEventListener('click', ()=>{
+					this.canvas.addEventListener('mousemove', (e)=>{
+						const canvasCoordinates = this.canvas.getBoundingClientRect();//объект координат элемента-canvas
+						//console.log(canvasCoordinates);
+						this.mouseX = e.clientX - canvasCoordinates.left;//координаты мыши 
+	      				this.mouseY = e.clientY - canvasCoordinates.top;//относительно canvas'a
 
-				function PrintArea(){
-					ctx.beginPath();//сброс текущиго контура
-					ctx.strokeStyle = '#34648E';
-					ctx.stroke();//линия
+						this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);//очистить прямоугольник размерами canvas'a
+						this.PrintArea();
 
-					let x1 = area.x-area.r,
-					y1 = area.y-area.r,
-					x2 = area.r*2,
-					y2 = area.r*2;
-					ctx.strokeRect(x1,y1,x2,y2);
+						this.MoveBall();
+					});
+
 				}
-				function PrintBall(x=ball.x,y=ball.y){
-					ctx.beginPath();
-					ctx.arc(x, y, ball.r, 0, 2*Math.PI, false);
-					ctx.fillStyle = '#0294BF';
-					ctx.fill();//заливка
-				}
+				PrintArea(){
+					this.ctx.beginPath();//сброс текущиго контура
+					this.ctx.strokeStyle = '#34648E';
+					this.ctx.stroke();//линия
 
-				function AreaCoordinates(){
-					let x1 = area.x - area.r,
-					x2 = area.x + area.r,
-					y1 = area.y - area.r,
-					y2 = area.y + area.r;
+					const x1 = this.area.x-this.area.r,
+					y1 = this.area.y-this.area.r,
+					x2 = this.area.r*2,
+					y2 = this.area.r*2;
+					this.ctx.strokeRect(x1,y1,x2,y2);
+				}
+				PrintBall(x=this.ball.x,y=this.ball.y){
+					this.ctx.beginPath();
+					this.ctx.arc(x, y, this.ball.r, 0, 2*Math.PI, false);
+					this.ctx.fillStyle = '#0294BF';
+					this.ctx.fill();//заливка
+				}
+				AreaCoordinates(){
+					const x1 = this.area.x - this.area.r,
+					x2 = this.area.x + this.area.r,
+					y1 = this.area.y - this.area.r,
+					y2 = this.area.y + this.area.r;
 					return {x1:x1,x2:x2,y1:y1,y2:y2}
 				}
 				//до каких точек круг может двигаться
 				//координаты area +- размер круга
-				function Restriction(){
+				Restriction(){
+					const areaC = this.AreaCoordinates();
 					return {
-						x1:areaCoordinates.x1+ball.r,
-						x2:areaCoordinates.x2-ball.r,
-						y1:areaCoordinates.y1+ball.r,
-						y2:areaCoordinates.y2-ball.r
+						x1:areaC.x1+this.ball.r,
+						x2:areaC.x2-this.ball.r,
+						y1:areaC.y1+this.ball.r,
+						y2:areaC.y2-this.ball.r
 					}
 				}
-
 				//вычислить координаты круга и переместить его в эту точку
-				function MoveBall(){
-					let x=mouseX,
-					y=mouseY;
-					if(mouseX<restrict.x1)
-						x=restrict.x1;
-					if(mouseX>restrict.x2)
-						x=restrict.x2;
-					if(mouseY<restrict.y1)
-						y=restrict.y1;
-					if(mouseY>restrict.y2)
-						y=restrict.y2;
+				MoveBall(){
+					let x=this.mouseX,
+					y=this.mouseY;
+					if(this.mouseX<this.restrict.x1)
+						x=this.restrict.x1;
+					if(this.mouseX>this.restrict.x2)
+						x=this.restrict.x2;
+					if(this.mouseY<this.restrict.y1)
+						y=this.restrict.y1;
+					if(this.mouseY>this.restrict.y2)
+						y=this.restrict.y2;
 
-					PrintBall(x,y);
+					this.PrintBall(x,y);
 				}
+			}
 
-  			}
+			window.onload = function() {
+				new Circles(document.getElementById("content"));
+			}
 		</script>
 	</head>
 	<body>
